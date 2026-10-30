@@ -79,12 +79,16 @@ def build_agent(model_name: str):
 
     selected_model = normalize_model_name(model_name)
 
-    # Initialize ChatGoogleGenerativeAI
-    llm = ChatGoogleGenerativeAI(
-        model=selected_model,
-        temperature=0.3,
-        streaming=True
-    )
+    llm_kwargs = {
+        "model": selected_model,
+        "temperature": 0.3,
+        "streaming": True,
+    }
+    # Gemini 3 defaults to high thinking and sends no text until that finishes.
+    if "gemini-3" in selected_model:
+        llm_kwargs["thinking_level"] = "low"
+
+    llm = ChatGoogleGenerativeAI(**llm_kwargs)
 
     llm_with_tools = llm.bind_tools(tools)
 
